@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Painel · Química em Foco{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end mb-4 gap-3">
+  <div>
+    <div class="eyebrow">PAINEL DO PROFESSOR</div>
+    <h1 class="display-6 fw-bold mb-1">Visão geral da aprendizagem</h1>
+    <p class="text-muted mb-0">Relacione desempenho, frequência e conteúdos para acompanhar a turma ao longo do ano.</p>
+  </div>
+  <form class="card filter-card p-3" method="get">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-md-auto">
+        <label class="form-label small">Turma</label>
+        <select class="form-select" name="turma" onchange="this.form.submit()">
+          <option value="">Todas</option>
+          {% for t in turmas %}<option value="{{ t.id }}" {% if filtros.turma == t.id|string %}selected{% endif %}>{{ t.nome }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-auto">
+        <label class="form-label small">Estudante</label>
+        <select class="form-select" name="aluno">
+          <option value="">Todos</option>
+          {% for a in alunos_turma %}<option value="{{ a.id }}" {% if filtros.aluno == a.id|string %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-auto"><label class="form-label small">De</label><input type="date" class="form-control" name="inicio" value="{{ filtros.inicio }}"></div>
+      <div class="col-6 col-md-auto"><label class="form-label small">Até</label><input type="date" class="form-control" name="fim" value="{{ filtros.fim }}"></div>
+      <div class="col-12 col-md-auto"><button class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Filtrar</button></div>
+    </div>
+  </form>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3"><div class="metric metric-purple"><span>Estudantes</span><strong>{{ student_count }}</strong><i class="bi bi-people"></i></div></div>
+  <div class="col-6 col-xl-3"><div class="metric metric-orange"><span>Média geral</span><strong>{{ "%.2f"|format(average) }}</strong><small>/ 10</small><i class="bi bi-graph-up-arrow"></i></div></div>
+  <div class="col-6 col-xl-3"><div class="metric metric-blue"><span>Avaliações</span><strong>{{ eval_count }}</strong><i class="bi bi-clipboard2-check"></i></div></div>
+  <div class="col-6 col-xl-3"><div class="metric metric-green"><span>Frequência média</span><strong>{{ "%.1f"|format(attendance) }}%</strong><i class="bi bi-calendar-check"></i></div></div>
+</div>
+
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="card panel-card h-100">
+      <div class="card-body">
+        <div class="section-title"><div><h5>Evolução das médias</h5><p>Média da turma em cada avaliação selecionada</p></div><span class="pill">Notas</span></div>
+        <div class="chart-wrap"><canvas id="evolutionChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="card panel-card h-100">
+      <div class="card-body">
+        <div class="section-title"><div><h5>Distribuição de notas</h5><p>Faixas de desempenho</p></div></div>
+        <div class="chart-wrap chart-small"><canvas id="distributionChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-0">
+  <div class="col-xl-7">
+    <div class="card panel-card">
+      <div class="card-body">
+        <div class="section-title"><div><h5>Estudantes</h5><p>Indicadores individuais para acompanhamento</p></div><a href="{{ url_for('alunos') }}" class="btn btn-sm btn-outline-primary">Gerenciar</a></div>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>Estudante</th><th>Turma</th><th>Média</th><th>Frequência</th><th>Situação</th></tr></thead>
+            <tbody>
+            {% for s in students %}
+              {% set low_grade = s.media is not none and s.media < 6 %}
+              {% set low_freq = s.frequencia is not none and s.frequencia < 75 %}
+              <tr>
+                <td><strong>{{ s.nome }}</strong><br><small class="text-muted">{{ s.matricula or "sem matrícula" }}</small></td>
+                <td>{{ s.turma }}</td>
+                <td><span class="score">{{ "%.2f"|format(s.media or 0) }}</span></td>
+                <td>{{ "%.1f"|format(s.frequencia or 0) }}%</td>
+                <td>{% if low_grade or low_freq %}<span class="badge-soft warning">Atenção</span>{% else %}<span class="badge-soft success">Acompanhamento regular</span>{% endif %}</td>
+              </tr>
+            {% else %}<tr><td colspan="5" class="text-center text-muted py-4">Nenhum estudante encontrado.</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-5">
+    <div class="card panel-card attention-card">
+      <div class="card-body">
+        <div class="section-title"><div><h5>Radar de acompanhamento</h5><p>Regras simples para apoiar a leitura dos dados</p></div><i class="bi bi-radar fs-3"></i></div>
+        {% for item in attention %}
+        <div class="attention-item">
+          <div class="avatar">{{ item.nome[:1] }}</div>
+          <div><strong>{{ item.nome }}</strong><small>{{ item.turma }} · {{ item.motivos|join(" · ") }}</small></div>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-stars"></i><strong>Nenhum sinal de atenção pelos critérios atuais.</strong><span>Isso não substitui a análise pedagógica individual.</span></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const evolution = {{ evolution|tojson }};
+new Chart(document.getElementById('evolutionChart'), {
+  type: 'line',
+  data: { labels: evolution.map(x => x.data.split('-').reverse().join('/')), datasets: [{
+    label: 'Média', data: evolution.map(x => x.media), tension: .35, fill: true
+  }]},
+  options: { responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:10,beginAtZero:true}}}
+});
+const dist = {{ distribution|tojson }};
+new Chart(document.getElementById('distributionChart'), {
+  type:'doughnut',
+  data:{labels:Object.keys(dist),datasets:[{data:Object.values(dist)}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}
+});
+</script>
+{% endblock %}

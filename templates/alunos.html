@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Estudantes{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow">CADASTRO</div><h1>Estudantes</h1><p>Organize as turmas e identifique rapidamente cada estudante.</p></div></div>
+<div class="row g-4">
+  <div class="col-xl-4">
+    <div class="card panel-card"><div class="card-body">
+      <h5>Novo estudante</h5>
+      <form method="post" class="mt-3">
+        <label class="form-label">Nome</label><input required class="form-control mb-3" name="nome">
+        <label class="form-label">Matrícula</label><input class="form-control mb-3" name="matricula">
+        <label class="form-label">Turma</label><select required class="form-select mb-3" name="turma_id">{% for t in turmas %}<option value="{{ t.id }}">{{ t.nome }} — {{ t.ano }}</option>{% endfor %}</select>
+        <button class="btn btn-primary w-100"><i class="bi bi-person-plus"></i> Cadastrar</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-xl-8">
+    <div class="card panel-card"><div class="card-body">
+      <div class="section-title"><div><h5>Lista de estudantes</h5><p>{{ alunos|length }} registros</p></div></div>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Nome</th><th>Matrícula</th><th>Turma</th><th>Ativo</th></tr></thead><tbody>
+      {% for a in alunos %}<tr><td><strong>{{ a.nome }}</strong></td><td>{{ a.matricula or "—" }}</td><td>{{ a.turma }}</td><td><span class="badge-soft success">Ativo</span></td></tr>{% endfor %}
+      </tbody></table></div>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

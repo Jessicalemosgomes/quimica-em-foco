@@ -1,0 +1,38 @@
+:root{
+  --ink:#172033;--muted:#6b7280;--purple:#6d5dfc;--orange:#ff8a3d;--blue:#2f80ed;--green:#16b364;
+  --bg:#f6f7fb;--card:#fff;--line:#e8eaf0;
+}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app-navbar{background:linear-gradient(100deg,#3f2f9b,#6d5dfc 55%,#8a7dff);box-shadow:0 5px 22px rgba(51,36,140,.2)}
+.brand-orb{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#fff2;color:#fff;margin-right:7px}
+.navbar .nav-link{color:#fff!important;opacity:.9}
+.navbar .nav-link:hover{opacity:1}
+.eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.15em;color:var(--purple);margin-bottom:7px}
+.page-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:25px}
+.page-head h1{font-weight:800;font-size:2.1rem;margin:0 0 5px}
+.page-head p{color:var(--muted);margin:0}
+.filter-card{border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 30px #2020400b;background:#fff}
+.metric{position:relative;overflow:hidden;border-radius:20px;padding:21px;color:white;min-height:130px;box-shadow:0 10px 25px #20204014}
+.metric span{display:block;font-size:.86rem;opacity:.9}.metric strong{font-size:2rem;display:inline-block;margin-top:8px}.metric small{font-weight:700}
+.metric i{position:absolute;right:18px;bottom:15px;font-size:2.7rem;opacity:.18}
+.metric-purple{background:linear-gradient(135deg,#6d5dfc,#958bff)}.metric-orange{background:linear-gradient(135deg,#f56d32,#ffad5c)}
+.metric-blue{background:linear-gradient(135deg,#2878df,#59a1ff)}.metric-green{background:linear-gradient(135deg,#0b9d59,#50c98b)}
+.panel-card{border:1px solid var(--line);border-radius:20px;box-shadow:0 7px 28px #2020400a;background:var(--card)}
+.panel-card .card-body{padding:24px}
+.section-title{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:15px}
+.section-title h5{font-weight:800;margin:0}.section-title p{color:var(--muted);font-size:.85rem;margin:4px 0 0}
+.pill{padding:6px 10px;border-radius:999px;background:#f0edff;color:#5a4ce0;font-size:.75rem;font-weight:700}
+.chart-wrap{height:315px}.chart-small{height:280px}
+.table{--bs-table-bg:transparent}.table thead th{color:#7b8191;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line)}
+.table tbody td{border-color:#f0f1f5}
+.score{font-weight:800}
+.badge-soft{font-size:.75rem;font-weight:700;padding:6px 10px;border-radius:999px}.badge-soft.success{background:#e8f8ef;color:#11864d}.badge-soft.warning{background:#fff2df;color:#ad6500}
+.attention-card{background:linear-gradient(180deg,#fff,#fbfaff)}
+.attention-item{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid #eeeef4}.attention-item:last-child{border-bottom:0}
+.attention-item small{display:block;color:var(--muted);margin-top:3px}.avatar{width:38px;height:38px;border-radius:13px;background:#edeaff;color:#5b4de0;display:grid;place-items:center;font-weight:800;flex:0 0 auto}
+.empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;padding:35px 10px;color:var(--muted);gap:6px}.empty-state i{font-size:2rem;color:#8d81ff}.empty-state strong{color:var(--ink)}
+.timeline{position:relative;margin-left:8px}.timeline:before{content:"";position:absolute;left:6px;top:5px;bottom:5px;width:2px;background:#e7e5ff}.timeline-item{position:relative;display:flex;gap:17px;padding:0 0 24px 0}.timeline-dot{width:14px;height:14px;border-radius:50%;background:var(--purple);border:3px solid #e9e6ff;position:relative;z-index:1;flex:0 0 auto}
+.btn-primary{background:var(--purple);border-color:var(--purple)}.btn-primary:hover{background:#5848ed;border-color:#5848ed}
+.form-control,.form-select{border-color:#dfe2ea;border-radius:11px;padding:.65rem .75rem}.form-control:focus,.form-select:focus{border-color:#9a90ff;box-shadow:0 0 0 .2rem #6d5dfc18}
+.alert{border-radius:14px;border:0}
+@media(max-width:767px){.page-head{align-items:start}.metric{min-height:115px}.panel-card .card-body{padding:18px}.chart-wrap{height:250px}}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Avaliações{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow">DESEMPENHO</div><h1>Avaliações</h1><p>Crie instrumentos avaliativos e acompanhe as médias de cada atividade.</p></div></div>
+<div class="row g-4">
+  <div class="col-xl-4"><div class="card panel-card"><div class="card-body">
+    <h5>Nova avaliação</h5><form method="post" class="mt-3">
+      <label class="form-label">Título</label><input required class="form-control mb-3" name="titulo" placeholder="Ex.: Avaliação 1">
+      <div class="row"><div class="col-6"><label class="form-label">Data</label><input required type="date" class="form-control mb-3" name="data"></div><div class="col-6"><label class="form-label">Valor</label><input type="number" step=".1" class="form-control mb-3" name="valor" value="10"></div></div>
+      <label class="form-label">Turma</label><select required class="form-select mb-3" name="turma_id">{% for t in turmas %}<option value="{{ t.id }}">{{ t.nome }}</option>{% endfor %}</select>
+      <label class="form-label">Tipo</label><select class="form-select mb-3" name="tipo"><option>Prova</option><option>Lista</option><option>Projeto</option><option>Seminário</option><option>Diagnóstica</option><option>Outro</option></select>
+      <label class="form-label">Conteúdo / habilidade</label><input class="form-control mb-3" name="conteudo" placeholder="Ex.: Estequiometria">
+      <button class="btn btn-primary w-100">Criar avaliação</button>
+    </form>
+  </div></div>
+  <div class="col-xl-8"><div class="card panel-card"><div class="card-body">
+    <div class="section-title"><div><h5>Avaliações cadastradas</h5><p>Abra uma avaliação para lançar as notas.</p></div></div>
+    <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Data</th><th>Avaliação</th><th>Turma</th><th>Média</th><th></th></tr></thead><tbody>
+    {% for a in avaliacoes %}<tr><td>{{ a.data.split('-')|reverse|join('/') }}</td><td><strong>{{ a.titulo }}</strong><br><small class="text-muted">{{ a.tipo }} · {{ a.conteudo or "sem conteúdo informado" }}</small></td><td>{{ a.turma }}</td><td><span class="score">{{ a.media or "—" }}</span></td><td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('notas', avaliacao_id=a.id) }}">Lançar notas</a></td></tr>{% endfor %}
+    </tbody></table></div>
+  </div></div></div>
+</div>
+{% endblock %}
