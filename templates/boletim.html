@@ -1,0 +1,223 @@
+```html
+{% extends "base.html" %}
+
+{% block title %}Boletim{% endblock %}
+
+{% block content %}
+
+<div class="page-head">
+    <div>
+        <div class="eyebrow">ACOMPANHAMENTO</div>
+        <h1>Boletim do aluno</h1>
+        <p>Consulte notas e frequência por aluno.</p>
+    </div>
+</div>
+
+<div class="card filter-card p-3 mb-4">
+    <form method="get">
+        <div class="row g-3 align-items-end">
+
+            <div class="col-md-5">
+                <label class="form-label">Turma</label>
+
+                <select
+                    name="turma"
+                    class="form-select"
+                    onchange="this.form.submit()"
+                >
+                    <option value="">Selecione uma turma</option>
+
+                    {% for t in turmas %}
+                        <option
+                            value="{{ t.id }}"
+                            {% if turma_id == t.id %}selected{% endif %}
+                        >
+                            {{ t.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-5">
+                <label class="form-label">Aluno</label>
+
+                <select
+                    name="aluno"
+                    class="form-select"
+                    {% if not turma_id %}disabled{% endif %}
+                >
+                    <option value="">Selecione um aluno</option>
+
+                    {% for a in alunos %}
+                        <option
+                            value="{{ a.id }}"
+                            {% if aluno_id == a.id %}selected{% endif %}
+                        >
+                            {{ a.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button
+                    type="submit"
+                    class="btn btn-primary w-100"
+                    {% if not turma_id %}disabled{% endif %}
+                >
+                    Consultar
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+{% if aluno_id %}
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-4">
+        <div class="card panel-card h-100">
+            <div class="card-body">
+                <div class="eyebrow">MÉDIA</div>
+
+                <div class="display-5 fw-bold">
+                    {% if media is not none %}
+                        {{ "%.2f"|format(media) }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+
+                <p class="text-muted mb-0">
+                    Média das avaliações lançadas
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card panel-card h-100">
+            <div class="card-body">
+                <div class="eyebrow">FREQUÊNCIA</div>
+
+                <div class="display-5 fw-bold">
+                    {% if frequencia_percentual is not none %}
+                        {{ "%.2f"|format(frequencia_percentual) }}%
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+
+                <p class="text-muted mb-0">
+                    {{ total_presencas }} presença(s)
+                    em {{ total_aulas }} aula(s)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card panel-card h-100">
+            <div class="card-body">
+                <div class="eyebrow">AVALIAÇÕES</div>
+
+                <div class="display-5 fw-bold">
+                    {{ avaliacoes|length }}
+                </div>
+
+                <p class="text-muted mb-0">
+                    Avaliações da turma
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card panel-card">
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <div class="eyebrow">NOTAS</div>
+                <h2 class="h4 mb-0">Avaliações</h2>
+            </div>
+        </div>
+
+        {% if avaliacoes %}
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Avaliação</th>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Nota</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for av in avaliacoes %}
+
+                    <tr>
+                        <td>
+                            <strong>{{ av.titulo }}</strong>
+                        </td>
+
+                        <td>
+                            {{ av.data }}
+                        </td>
+
+                        <td>
+                            {{ av.tipo }}
+                        </td>
+
+                        <td>
+                            {{ "%.2f"|format(av.valor) }}
+                        </td>
+
+                        <td>
+                            {% if av.nota is not none %}
+                                <strong>
+                                    {{ "%.2f"|format(av.nota) }}
+                                </strong>
+                            {% else %}
+                                <span class="text-muted">
+                                    Não lançada
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="alert alert-info mb-0">
+            Nenhuma avaliação encontrada para este aluno.
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}
+```

@@ -450,6 +450,119 @@ def frequencia():
     )
 
 
+
+@app.route("/boletim", methods=["GET"])
+def boletim():
+    conn = get_db()
+
+    turma = request.args.get("turma", "")
+    aluno = request.args.get("aluno", "")
+
+    turma_id = int(turma) if turma.isdigit() else None
+    aluno_id = int(aluno) if aluno.isdigit() else None
+
+    turmas = row_dicts(
+        conn.execute(
+            "SELECT * FROM turmas ORDER BY nome"
+        )
+    )
+
+    alunos = []
+
+    if turma_id:
+        alunos = row_dicts(
+            conn.execute(
+                """
+                SELECT *
+                FROM alunos
+                WHERE ativo = 1
+                  AND turma_id = ?
+                ORDER BY nome
+                """,
+                (turma_id,)
+            )
+        )
+
+    avaliacoes = []
+    media = None
+    total_aulas = 0
+    total_presencas = 0
+    frequencia_percentual = None
+
+    if aluno_id:
+        avaliacoes = row_dicts(
+            conn.execute(
+                """
+                SELECT
+                    av.id,
+                    av.titulo,
+                    av.data,
+                    av.tipo,
+                    av.valor,
+                    n.nota
+                FROM avaliacoes av
+                LEFT JOIN notas n
+                    ON n.avaliacao_id = av.id
+                    AND n.aluno_id = ?
+                WHERE av.turma_id = ?
+                ORDER BY av.data, av.id
+                """,
+                (aluno_id, turma_id)
+            )
+        )
+
+        notas_validas = [
+            float(a["nota"])
+            for a in avaliacoes
+            if a["nota"] is not None
+        ]
+
+        if notas_validas:
+            media = round(
+                sum(notas_validas) / len(notas_validas),
+                2
+            )
+
+        frequencia = row_dicts(
+            conn.execute(
+                """
+                SELECT presente
+                FROM frequencia
+                WHERE aluno_id = ?
+                ORDER BY data
+                """,
+                (aluno_id,)
+            )
+        )
+
+        total_aulas = len(frequencia)
+        total_presencas = sum(
+            1 for f in frequencia
+            if f["presente"] == 1
+        )
+
+        if total_aulas:
+            frequencia_percentual = round(
+                (total_presencas / total_aulas) * 100,
+                2
+            )
+
+    conn.close()
+
+    return render_template(
+        "boletim.html",
+        turmas=turmas,
+        alunos=alunos,
+        turma_id=turma_id,
+        aluno_id=aluno_id,
+        avaliacoes=avaliacoes,
+        media=media,
+        total_aulas=total_aulas,
+        total_presencas=total_presencas,
+        frequencia_percentual=frequencia_percentual
+    )
+
+
 @app.route("/conteudos", methods=["GET", "POST"])
 def conteudos():
     conn = get_db()
