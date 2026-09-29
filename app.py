@@ -370,20 +370,84 @@ def notas(avaliacao_id):
 
 @app.route("/frequencia", methods=["GET", "POST"])
 def frequencia():
-    conn = get_db(); turma = request.args.get("turma", ""); turma_id = int(turma) if turma.isdigit() else None
-    data = request.args.get("data") or date.today().isoformat()
+    conn = get_db()
+
     if request.method == "POST":
-        turma_id = int(request.form["turma_id"]); data = request.form["data"]
-        for key, value in request.form.items():
-            if key.startswith("presenca_"):
-                aluno_id = int(key.split("_")[1]); presente = 1 if value == "1" else 0; obs = request.form.get(f"obs_{aluno_id}", "")
-                conn.execute("""INSERT INTO frequencia(aluno_id,data,presente,observacao) VALUES (?,?,?,?)
-                    ON CONFLICT(aluno_id,data) DO UPDATE SET presente=excluded.presente, observacao=excluded.observacao""", (aluno_id, data, presente, obs))
-        conn.commit(); flash("Frequência registrada.", "success")
-    alunos = row_dicts(conn.execute("""SELECT a.*, f.presente, f.observacao FROM alunos a
-           LEFT JOIN frequencia f ON f.aluno_id=a.id AND f.data=? WHERE a.ativo=1 """ + ("AND a.turma_id=? " if turma_id else "") + "ORDER BY a.nome",
-        (data, turma_id) if turma_id else (data,)))
-    conn.close(); return render_template("frequencia.html", alunos=alunos, turma_id=turma_id, data=data)
+        turma_id_str = request.form.get("turma_id", "")
+        data = request.form.get("data") or date.today().isoformat()
+
+        # Evita erro quando o formulário envia "None", vazio ou valor inválido
+        if not turma_id_str or turma_id_str == "None" or not turma_id_str.isdigit():
+            flash("Selecione uma turma antes de salvar a frequência.", "danger")
+        else:
+            turma_id = int(turma_id_str)
+
+            for key, value in request.form.items():
+                if key.startswith("presenca_"):
+                    aluno_id = int(key.split("_")[1])
+                    presente = 1 if value == "1" else 0
+                    obs = request.form.get(f"obs_{aluno_id}", "")
+
+                    conn.execute(
+                        """
+                        INSERT INTO frequencia
+                            (aluno_id, data, presente, observacao)
+                        VALUES (?, ?, ?, ?)
+                        ON CONFLICT(aluno_id, data)
+                        DO UPDATE SET
+                            presente = excluded.presente,
+                            observacao = excluded.observacao
+                        """,
+                        (aluno_id, data, presente, obs)
+                    )
+
+            conn.commit()
+            flash("Frequência registrada.", "success")
+
+    # Filtros da página
+    turma = request.args.get("turma", "")
+    turma_id = int(turma) if turma.isdigit() else None
+    data = request.args.get("data") or date.today().isoformat()
+
+    # Lista de turmas
+    turmas = row_dicts(
+        conn.execute(
+            "SELECT * FROM turmas ORDER BY nome"
+        )
+    )
+
+    # Lista de alunos
+    if turma_id:
+        alunos = row_dicts(
+            conn.execute(
+                """
+                SELECT
+                    a.*,
+                    f.presente,
+                    f.observacao
+                FROM alunos a
+                LEFT JOIN frequencia f
+                    ON f.aluno_id = a.id
+                    AND f.data = ?
+                WHERE a.ativo = 1
+                  AND a.turma_id = ?
+                ORDER BY a.nome
+                """,
+                (data, turma_id)
+            )
+        )
+    else:
+        alunos = []
+
+    conn.close()
+
+    return render_template(
+        "frequencia.html",
+        alunos=alunos,
+        turmas=turmas,
+        turma_id=turma_id,
+        data=data
+    )
 
 
 @app.route("/conteudos", methods=["GET", "POST"])

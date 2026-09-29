@@ -3,19 +3,25 @@
 {% block content %}
 <div class="page-head"><div><div class="eyebrow">PRESENÇA</div><h1>Registro de frequência</h1><p>Marque presença por data e turma. O painel calcula a frequência automaticamente.</p></div></div>
 <form method="get" class="card filter-card p-3 mb-4"><div class="row g-3 align-items-end">
-<div class="col-md-4"><label class="form-label">Turma</label><select name="turma" class="form-select">{% for t in turmas %}<option value="{{ t.id }}" {% if turma_id == t.id %}selected{% endif %}>{{ t.nome }}</option>{% endfor %}</select></div>
+<div class="col-md-4"><label class="form-label">Turma</label><select name="turma" class="form-select">{% for t in turmas %}<option value="{{ t.id }}" {% if turma_id ==t.id %}selected{% endif %}>{{ t.nome }}</option>{% endfor %}</select></div>
 <div class="col-md-4"><label class="form-label">Data</label><input type="date" name="data" class="form-control" value="{{ data }}"></div>
 <div class="col-md-3"><button class="btn btn-outline-primary w-100">Carregar lista</button></div>
 </div></form>
 <div class="card panel-card"><div class="card-body">
-<form method="post"><input type="hidden" name="turma_id" value="{{ turma_id }}"><input type="hidden" name="data" value="{{ data }}">
+<form method="post"><input type="hidden" name="turma_id" value="{{ turma_id or '' }}"><input type="hidden" name="data" value="{{ data }}">
 <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Estudante</th><th>Presença</th><th>Observação</th></tr></thead><tbody>
 {% for a in alunos %}<tr><td><strong>{{ a.nome }}</strong></td><td>
 <div class="btn-group" role="group"><input type="radio" class="btn-check" name="presenca_{{ a.id }}" value="1" id="p{{ a.id }}" {% if a.presente == 1 or a.presente is none %}checked{% endif %}><label class="btn btn-outline-success" for="p{{ a.id }}">Presente</label>
 <input type="radio" class="btn-check" name="presenca_{{ a.id }}" value="0" id="f{{ a.id }}" {% if a.presente == 0 and a.presente is not none %}checked{% endif %}><label class="btn btn-outline-danger" for="f{{ a.id }}">Falta</label></div>
 </td><td><input class="form-control" name="obs_{{ a.id }}" value="{{ a.observacao or '' }}"></td></tr>{% endfor %}
 </tbody></table></div>
-<button class="btn btn-primary">Salvar frequência</button>
+{% if turma_id %}
+    <button class="btn btn-primary">Salvar frequência</button>
+{% else %}
+    <div class="alert alert-info">
+        Selecione uma turma e clique em <strong>Carregar lista</strong> para registrar a frequência.
+    </div>
+{% endif %}
 </form>
 </div></div>
 {% endblock %}
