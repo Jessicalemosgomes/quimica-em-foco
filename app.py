@@ -342,7 +342,7 @@ def avaliacoes():
         conn.commit(); flash("Avaliação criada.", "success"); return redirect(url_for("avaliacoes"))
     rows = row_dicts(conn.execute("""SELECT av.*, t.nome turma,
                   (SELECT COUNT(*) FROM notas n WHERE n.avaliacao_id=av.id) qtd_notas,
-                  ROUND((SELECT AVG(n.nota) FROM notas n WHERE n.avaliacao_id=av.id),2) media
+                  ROUND((SELECT AVG(n.nota) FROM notas n WHERE n.avaliacao_id=av.id)::numeric,2) media
            FROM avaliacoes av JOIN turmas t ON t.id=av.turma_id ORDER BY av.data DESC""")); conn.close()
     return render_template("avaliacoes.html", avaliacoes=rows)
 
